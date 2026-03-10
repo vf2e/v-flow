@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "identifier": "default",
-  "description": "允许 v-flow 访问文件系统、对话框及媒体资产播放",
+  "description": "允许核心功能及本地视频播放",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -10,29 +10,10 @@
     "opener:default",
     "opener:allow-open-path",
     "fs:default",
-    {
-      "identifier": "fs:allow-read-dir",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    },
-    {
-      "identifier": "fs:allow-read-file",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    },
-    {
-      "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    },
-    {
-      "identifier": "fs:allow-copy-file",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    },
-    {
-      "identifier": "fs:allow-write-file",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    },
-    {
-      "identifier": "protocol:allow-asset",
-      "allow": [{ "path": "**" }, { "path": "D:\\**" }]
-    }
+    "fs:allow-read-dir",
+    "fs:allow-read-file",
+    "fs:allow-mkdir",
+    "fs:allow-copy-file",
+    "fs:allow-write-file"
   ]
 }

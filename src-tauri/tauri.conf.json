@@ -18,15 +18,8 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; media-src 'self' asset: https://asset.localhost; connect-src 'self' ipc: http://ipc.localhost",
-      "capabilities": ["default"]
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; media-src 'self' asset: https://asset.localhost; connect-src 'self' ipc: http://ipc.localhost"
     }
-  },
-  "plugins": {
-    "fs": {
-      "scope": ["**", "D:\\**"]
-    },
-    "dialog": {}
   },
   "bundle": {
     "active": true,
