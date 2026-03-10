@@ -5,10 +5,11 @@ use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_opener::OpenerExt;
 
 // Axum 相关导入
-use axum::{extract::Path as AxumPath, routing::get, Router, response::IntoResponse};
+use axum::{extract::Path as AxumPath, routing::get, Router, response::IntoResponse, response::Response};
 use tower_http::services::ServeFile;
 use tower_http::cors::CorsLayer;
-use tower::ServiceExt;
+// 关键修复：显式使用 tower::util 路径，确保 oneshot 方法可用
+use tower::util::ServiceExt;
 
 #[derive(Serialize, Deserialize)]
 pub struct VideoItem {
@@ -16,7 +17,7 @@ pub struct VideoItem {
     path: String,
 }
 
-// 1. 扫描目录并返回视频列表 (保持原逻辑)
+// 1. 扫描目录并返回视频列表
 #[tauri::command]
 async fn open_directory(app: tauri::AppHandle) -> Result<Vec<VideoItem>, String> {
     let dir_path = app.dialog().file().blocking_pick_folder();
@@ -41,7 +42,7 @@ async fn open_directory(app: tauri::AppHandle) -> Result<Vec<VideoItem>, String>
     Ok(videos)
 }
 
-// 2. 导出收藏视频 (保持原逻辑)
+// 2. 导出收藏视频
 #[tauri::command]
 async fn export_favorites(app: tauri::AppHandle, file_paths: Vec<String>) -> Result<String, String> {
     for path_str in file_paths {
@@ -58,14 +59,16 @@ async fn export_favorites(app: tauri::AppHandle, file_paths: Vec<String>) -> Res
     Ok("核心资产已成功提取至 D 盘".to_string())
 }
 
-// 🚀 核心：Axum 处理函数，支持全盘符动态读取
+// 🚀 核心：Axum 处理函数，支持全盘符动态读取并支持 Range (进度条拖拽)
 async fn serve_local_file(
     AxumPath(file_path): AxumPath<String>,
     req: axum::extract::Request,
-) -> axum::response::Response {
-    // 恢复 Windows 绝对路径：将 "E:/video.mp4" 这种被前端 encode 的路径还原
+) -> Response {
+    // 恢复 Windows 绝对路径
     let path = file_path.trim_start_matches('/').to_string();
     let serve = ServeFile::new(path);
+    
+    // 显式指定 oneshot 处理，确保 Response 类型推导正确
     match serve.oneshot(req).await {
         Ok(res) => res.into_response(),
         Err(_) => axum::http::StatusCode::INTERNAL_SERVER_ERROR.into_response(),
@@ -76,7 +79,6 @@ async fn serve_local_file(
 pub fn run() {
     tauri::Builder::default()
         .setup(|_app| {
-            // 在独立的异步线程启动极客媒体引擎
             tauri::async_runtime::spawn(async {
                 let app = Router::new()
                     .route("/stream/*file_path", get(serve_local_file))

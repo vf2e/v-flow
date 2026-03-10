@@ -176,17 +176,26 @@ export default function App() {
         />
 
         {/* 播放器卡片 — 无边框纯粹感，仅保留光影 */}
-        <div className="relative flex-1 rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm shadow-2xl shadow-black/70 ring-1 ring-white/5">
+        <div className="relative flex-1 rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm shadow-2xl shadow-black/70 ring-1 ring-white/5 flex items-center justify-center">
           <GeekPlayer videoPath={currentVideo} />
         </div>
 
         {/* 快捷提示 — 超薄半透明条 */}
-        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-mono text-slate-600 bg-black/20 backdrop-blur-sm py-2 px-5 rounded-full border border-white/5 mx-auto shadow-lg">
+        <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-mono text-slate-600 bg-black/20 backdrop-blur-sm py-2 px-5 rounded-full border border-white/5 mx-auto shadow-lg z-10">
           <span className="flex items-center gap-2">
             <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">␣</kbd> 播放/暂停
           </span>
           <span className="flex items-center gap-2">
-            <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">R</kbd> 旋转90°
+            <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">Q</kbd> 左旋 90°
+          </span>
+          <span className="flex items-center gap-2">
+            <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">W</kbd> 右旋 90°
+          </span>
+          <span className="flex items-center gap-2">
+            <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">Z</kbd> 快退 5s
+          </span>
+          <span className="flex items-center gap-2">
+            <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">X</kbd> 快进 5s
           </span>
           <span className="flex items-center gap-2">
             <kbd className="bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-white/10 text-slate-300 shadow-inner text-[10px]">[</kbd> 减速
