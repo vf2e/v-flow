@@ -22,7 +22,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const [rotation, setRotation] = useState<number>(0);
   const [playbackRate, setPlaybackRate] = useState<number>(1);
 
-  // 快捷键逻辑
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const player = playerRef.current;
@@ -57,30 +56,40 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
   if (!videoPath) {
     return (
-      <div className="flex items-center justify-center w-full h-full bg-slate-900/50 rounded-2xl border border-slate-800">
-        <div className="text-slate-500 font-mono tracking-widest animate-pulse">AWAITING_SIGNAL...</div>
+      <div className="flex flex-col items-center justify-center w-full h-full bg-slate-900/30 rounded-3xl border border-slate-800/50 backdrop-blur-sm">
+        <div className="text-slate-600 font-mono text-sm tracking-[0.3em] animate-pulse">AWAITING_SIGNAL_INPUT</div>
       </div>
     );
   }
 
-  // 🚀 核心逻辑：对接到本地 1421 服务器
-  // 1. 将 Windows 反斜杠转为正斜杠
-  // 2. 使用 encodeURI 处理中文路径，确保 Axum 能正确接收
   const safePath = videoPath.replace(/\\/g, '/');
   const serverUrl = `http://127.0.0.1:1421/stream/${encodeURI(safePath)}`;
 
   return (
-    <div className="relative w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl group border border-white/5">
+    /* 外层容器：Flex 居中 */
+    <div className="relative w-full h-full flex items-center justify-center bg-black rounded-3xl overflow-hidden shadow-2xl group">
+      
+      {/* 旋转层：必须覆盖 100% 宽高 */}
       <div 
-        className="w-full h-full transition-transform duration-500 ease-out flex items-center justify-center"
+        className="w-full h-full transition-transform duration-500 ease-in-out flex items-center justify-center"
         style={{ transform: `rotate(${rotation}deg)` }}
       >
         <Player 
-          key={videoPath} // 路径切换时强制销毁旧实例，加载新视频
+          key={videoPath}
           ref={playerRef} 
           theme="dark"
-          style={{ '--vm-player-theme': '#06b6d4' } as any}
+          /* 核心修复：取消比例锁定，强制撑满 */
+          aspectRatio={undefined}
+          style={{ 
+            '--vm-player-theme': '#06b6d4',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          } as any}
         >
+          {/* 视频渲染层：确保视频内容居中且不拉伸 */}
           <Video crossOrigin="">
             <source src={serverUrl} data-src={serverUrl} type="video/mp4" />
           </Video>
@@ -96,15 +105,15 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         </Player>
       </div>
 
-      {/* OSD 面板 */}
-      <div className="absolute top-6 left-6 z-50 flex gap-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
-          <FastForward size={14} className="text-cyan-400" />
-          <span className="text-xs font-mono text-cyan-50">{playbackRate.toFixed(2)}x</span>
+      {/* OSD 数据面板 */}
+      <div className="absolute top-8 left-8 z-50 flex gap-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <div className="bg-slate-950/80 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/10 flex items-center gap-3">
+          <FastForward size={16} className="text-cyan-400" />
+          <span className="text-sm font-mono font-bold text-cyan-50">{playbackRate.toFixed(2)}x</span>
         </div>
-        <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
-          <RotateCw size={14} className="text-emerald-400" />
-          <span className="text-xs font-mono text-emerald-50">{rotation}°</span>
+        <div className="bg-slate-950/80 backdrop-blur-xl px-4 py-2 rounded-xl border border-white/10 flex items-center gap-3">
+          <RotateCw size={16} className="text-emerald-400" />
+          <span className="text-sm font-mono font-bold text-emerald-50">{rotation}°</span>
         </div>
       </div>
     </div>
