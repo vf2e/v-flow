@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { FolderOpen, HardDriveDownload, Heart, PlayCircle, Film, Sparkles, Grid3x3 } from 'lucide-react';
+import { FolderOpen, HardDriveDownload, Heart, PlayCircle, Film, Sparkles } from 'lucide-react';
 import GeekPlayer from './components/GeekPlayer';
 import { useVideoStore } from './store/useVideoStore';
 import './App.css';
@@ -56,19 +56,19 @@ export default function App() {
       {/* 左侧边栏 — 深邃立体 + 霓虹边框 */}
       <aside className="relative w-96 flex flex-col bg-[#0F1117]/90 backdrop-blur-2xl border-r border-white/5 shadow-2xl z-10">
         {/* 顶部装饰光条 */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-cyan-500/50 to-transparent" />
 
         {/* 头部区域 */}
         <div className="relative p-6 pb-4 border-b border-white/5">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="absolute inset-0 bg-cyan-500 blur-xl opacity-30 rounded-full" />
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-cyan-500/30 ring-1 ring-white/20">
+              <div className="relative w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400 via-blue-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-cyan-500/30 ring-1 ring-white/20">
                 <PlayCircle size={26} className="text-white drop-shadow-lg" />
               </div>
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tighter bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-black tracking-tighter bg-linear-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
                 V·FLOW
               </h1>
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500 mt-1">cinematic suite</p>
@@ -81,14 +81,14 @@ export default function App() {
               onClick={loadDirectory}
               className="group relative flex items-center justify-center gap-2 bg-slate-800/50 hover:bg-slate-700/60 border border-white/10 text-slate-200 py-3 rounded-xl transition-all duration-300 text-sm font-medium active:scale-[0.98] backdrop-blur-sm overflow-hidden"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/20 to-cyan-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <span className="absolute inset-0 bg-linear-to-r from-cyan-500/0 via-cyan-500/20 to-cyan-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               <FolderOpen size={16} className="group-hover:scale-110 transition-transform" />
               <span>载入目录</span>
             </button>
             <button
               onClick={exportFavorites}
               disabled={favorites.size === 0 || isExporting}
-              className="group relative flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-400 text-white py-3 rounded-xl transition-all duration-300 text-sm font-medium active:scale-[0.98] shadow-[0_8px_20px_rgba(8,145,178,0.4)] hover:shadow-[0_8px_25px_rgba(8,145,178,0.7)] disabled:shadow-none"
+              className="group relative flex items-center justify-center gap-2 bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-400 text-white py-3 rounded-xl transition-all duration-300 text-sm font-medium active:scale-[0.98] shadow-[0_8px_20px_rgba(8,145,178,0.4)] hover:shadow-[0_8px_25px_rgba(8,145,178,0.7)] disabled:shadow-none"
             >
               <HardDriveDownload size={16} className="group-hover:translate-y-[-1px] transition-transform" />
               <span>{isExporting ? '处理中...' : `提取 (${favorites.size})`}</span>
@@ -115,13 +115,13 @@ export default function App() {
                 style={{ animationDelay: `${index * 40}ms` }}
                 className={`group relative flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 border ${
                   currentVideo === vid.path
-                    ? 'bg-gradient-to-r from-cyan-950/70 to-blue-950/50 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.2)]'
+                    ? 'bg-linear-to-r from-cyan-950/70 to-blue-950/50 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.2)]'
                     : 'border-transparent hover:bg-slate-800/40 hover:border-slate-700/30'
                 }`}
               >
                 {/* 选中时左侧霓虹标记 */}
                 {currentVideo === vid.path && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-cyan-400 to-purple-500 rounded-r-full shadow-[0_0_12px_#06b6d4]" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-linear-to-b from-cyan-400 to-purple-500 rounded-r-full shadow-[0_0_12px_#06b6d4]" />
                 )}
 
                 <span

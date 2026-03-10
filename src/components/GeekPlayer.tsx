@@ -11,7 +11,6 @@ import {
   VolumeControl,
 } from '@vime/react';
 
-// 引入 Vime 基础样式
 import '@vime/core/themes/default.css';
 import { RotateCw, FastForward } from 'lucide-react';
 
@@ -77,16 +76,18 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         style={{ transform: `rotate(${rotation}deg)` }}
       >
         <Player 
+          // 关键修复：当视频路径改变时，强制 React 重新挂载播放器以刷新资源
+          key={videoPath}
           ref={playerRef} 
           theme="dark"
-          style={{ '--vm-player-theme': '#06b6d4' } as any} // 使用 cyan-500 作为主题色
+          style={{ '--vm-player-theme': '#06b6d4' } as any}
         >
           <Video crossOrigin="">
-            <source data-src={assetUrl} type="video/mp4" />
+            {/* 关键修复：同时提供 src 和 data-src 确保兼容性 */}
+            <source src={assetUrl} data-src={assetUrl} type="video/mp4" />
           </Video>
 
           <Ui>
-            {/* 隐藏原生 UI，定制极客 Controls */}
             <Controls fullWidth pin="bottomLeft" activeDuration={2000}>
               <PlaybackControl />
               <VolumeControl />
