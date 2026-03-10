@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* 自定义滚动条：符合深色极客美学 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1e293b; /* slate-800 */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #334155; /* slate-700 */
+}
+
+/* 解决视频旋转时的溢出裁剪问题 */
+video {
+  object-fit: contain;
+}
+
+/* 强制背景色，防止出现系统默认白底 */
+body {
+  background-color: #020617; /* slate-950 */
+  margin: 0;
+  padding: 0;
+}
