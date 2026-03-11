@@ -22,7 +22,6 @@ export default function App() {
     videos,
     setVideos,
     favorites,
-    toggleFavorite,
     currentVideo,
     setCurrentVideo,
   } = useVideoStore();
