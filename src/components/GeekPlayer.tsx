@@ -84,12 +84,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
   if (!videoPath) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-[#08080C] text-cyan-500/30 font-mono italic">
-        <Sparkles size={32} className="animate-pulse mb-4" />
-        <span className="tracking-[0.3em] text-[12px] uppercase text-center">
-          系统就绪 // 信号等待中
-        </span>
-      </div>
+      <div className="flex flex-col items-center justify-center w-full h-full bg-[#08080C] text-cyan-500/30 font-mono italic"></div>
     );
   }
 
