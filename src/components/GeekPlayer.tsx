@@ -16,10 +16,9 @@ import {
   ControlGroup,
   ControlSpacer,
 } from "@vime/react";
-
 import "@vime/core/themes/default.css";
-
-import { Gauge, RotateCw } from "lucide-react";
+import { Gauge, RotateCw, Heart } from "lucide-react";
+import { useVideoStore } from "../store/useVideoStore";
 interface PlayerProps {
   videoPath: string | null;
 }
@@ -31,6 +30,8 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const [rotation, setRotation] = useState<number>(0);
   const [playbackRate, setPlaybackRate] = useState<number>(1);
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
+
+  const { favorites } = useVideoStore();
 
   // 1. 动态监听容器尺寸，解决居中偏移的关键
   useEffect(() => {
@@ -109,6 +110,8 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const isVerticalRotated = Math.abs(rotation % 180) === 90;
   const playerWidth = isVerticalRotated ? containerSize.h : containerSize.w;
   const playerHeight = isVerticalRotated ? containerSize.w : containerSize.h;
+
+  const isFavorite = favorites.has(videoPath);
 
   return (
     <div
@@ -198,6 +201,30 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
             <RotateCw size={14} className="text-slate-400" />
             <span className="text-[11px] font-mono text-slate-300">
               {rotation}°
+            </span>
+          </div>
+          {/* 收藏标识：亮红霓虹效果 */}
+          <div
+            className={`transition-all duration-500 backdrop-blur-md border px-3 py-1 rounded-lg flex items-center gap-2 ${
+              isFavorite
+                ? "bg-rose-500/20 border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                : "bg-slate-900/40 border-white/10 opacity-40"
+            }`}
+          >
+            <Heart
+              size={14}
+              className={`transition-transform duration-100 ${
+                isFavorite
+                  ? "fill-rose-500 text-rose-500 scale-110"
+                  : "text-slate-400"
+              }`}
+            />
+            <span
+              className={`text-[10px] font-bold tracking-[0.2em] font-mono ${
+                isFavorite ? "text-rose-200" : "text-slate-500"
+              }`}
+            >
+              {isFavorite ? "已收藏" : "未收藏"}
             </span>
           </div>
         </div>
