@@ -4,15 +4,18 @@ import { persist } from 'zustand/middleware';
 interface VideoItem {
   name: string;
   path: string;
+  size: number;
 }
 
 interface VideoState {
   favorites: Set<string>;
   currentVideo: string | null;
   videos: VideoItem[];
+  exportProgress: number;
   setVideos: (videos: VideoItem[]) => void;
   setCurrentVideo: (path: string | null) => void;
   toggleFavorite: (path: string) => void;
+  setExportProgress: (progress: number) => void;
 }
 
 export const useVideoStore = create<VideoState>()(
@@ -21,9 +24,11 @@ export const useVideoStore = create<VideoState>()(
       favorites: new Set<string>(),
       currentVideo: null,
       videos: [],
+      exportProgress: 0,
       
       setVideos: (videos) => set({ videos }),
       setCurrentVideo: (path) => set({ currentVideo: path }),
+      setExportProgress: (exportProgress) => set({ exportProgress }),
       
       toggleFavorite: (path) => set((state) => {
         const next = new Set(state.favorites);
@@ -33,13 +38,11 @@ export const useVideoStore = create<VideoState>()(
       }),
     }),
     {
-      name: 'v-flow-storage',
-      // 将 Set 转换为 Array 进行持久化
+      name: 'v-flow-storage-v2',
       partialize: (state) => ({
         ...state,
         favorites: Array.from(state.favorites),
       }) as any,
-      // 读取时将 Array 转回 Set
       onRehydrateStorage: () => (state) => {
         if (state && Array.isArray(state.favorites)) {
           state.favorites = new Set(state.favorites);

@@ -33,7 +33,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
   const { favorites } = useVideoStore();
 
-  // 1. 动态监听容器尺寸，解决居中偏移的关键
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -51,7 +50,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
     return () => observer.disconnect();
   }, []);
 
-  // 2. 快捷键逻辑
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const player = playerRef.current;
@@ -98,7 +96,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   if (!videoPath) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full bg-slate-950 text-slate-700 font-mono italic">
-        AWAITING_SIGNAL_STREAM...
+        {/* AWAITING_SIGNAL_STREAM... */}
       </div>
     );
   }
@@ -106,7 +104,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const safePath = videoPath.replace(/\\/g, "/");
   const serverUrl = `http://127.0.0.1:1421/stream/${encodeURI(safePath)}`;
 
-  // 3. 核心计算：如果是垂直旋转（90/270度），则交换宽高以实现自适应最大化
   const isVerticalRotated = Math.abs(rotation % 180) === 90;
   const playerWidth = isVerticalRotated ? containerSize.h : containerSize.w;
   const playerHeight = isVerticalRotated ? containerSize.w : containerSize.h;
@@ -118,7 +115,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
       ref={containerRef}
       className="relative w-full h-full bg-black overflow-hidden flex items-center justify-center group"
     >
-      {/* 🚀 样式注入：解决 Vime 内部 Shadow DOM 的对齐问题 */}
       <style>{`
         vm-player {
           aspect-ratio: auto !important;
@@ -137,14 +133,12 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         }
       `}</style>
 
-      {/* 🚀 旋转定位层 */}
       <div
         className="absolute transition-all duration-500 ease-in-out flex items-center justify-center"
         style={{
           width: playerWidth > 0 ? `${playerWidth}px` : "100%",
           height: playerHeight > 0 ? `${playerHeight}px` : "100%",
           transform: `rotate(${rotation}deg)`,
-          // 强制使用 flex 居中
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

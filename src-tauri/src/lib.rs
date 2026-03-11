@@ -8,16 +8,15 @@ use tauri_plugin_opener::OpenerExt;
 use axum::{extract::Path as AxumPath, routing::get, Router, response::IntoResponse, response::Response};
 use tower_http::services::ServeFile;
 use tower_http::cors::CorsLayer;
-// 关键修复：显式使用 tower::util 路径，确保 oneshot 方法可用
 use tower::util::ServiceExt;
 
 #[derive(Serialize, Deserialize)]
 pub struct VideoItem {
     name: String,
     path: String,
+    size: u64, // 新增字段：文件大小
 }
 
-// 1. 扫描目录并返回视频列表
 #[tauri::command]
 async fn open_directory(app: tauri::AppHandle) -> Result<Vec<VideoItem>, String> {
     let dir_path = app.dialog().file().blocking_pick_folder();
@@ -30,9 +29,12 @@ async fn open_directory(app: tauri::AppHandle) -> Result<Vec<VideoItem>, String>
                 if p.is_file() {
                     let ext = p.extension().unwrap_or_default().to_str().unwrap_or_default().to_lowercase();
                     if ["mp4", "mkv", "avi", "mov", "webm"].contains(&ext.as_str()) {
+                        // 获取文件大小
+                        let size = fs::metadata(&p).map(|m| m.len()).unwrap_or(0);
                         videos.push(VideoItem {
                             name: p.file_name().unwrap().to_str().unwrap().to_string(),
                             path: p.to_str().unwrap().to_string(),
+                            size,
                         });
                     }
                 }
@@ -42,33 +44,31 @@ async fn open_directory(app: tauri::AppHandle) -> Result<Vec<VideoItem>, String>
     Ok(videos)
 }
 
-// 2. 导出收藏视频
 #[tauri::command]
-async fn export_favorites(app: tauri::AppHandle, file_paths: Vec<String>) -> Result<String, String> {
+async fn export_favorites(file_paths: Vec<String>, target_path: String) -> Result<String, String> {
+    let target_dir = Path::new(&target_path);
+    
+    if !target_dir.exists() {
+        return Err("目标目录不存在".into());
+    }
+
     for path_str in file_paths {
-        let path = Path::new(&path_str);
-        if let Some(file_name) = path.file_name() {
-            let folder_name = path.file_stem().unwrap().to_str().unwrap();
-            let target_dir = format!("D:\\{}", folder_name);
-            fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
-            let target_path = format!("{}\\{}", target_dir, file_name.to_str().unwrap());
-            fs::copy(path, target_path).map_err(|e| e.to_string())?;
+        let src_path = Path::new(&path_str);
+        if let Some(file_name) = src_path.file_name() {
+            // 导出：直接在目标目录下拼接文件名，不创建子文件夹
+            let dest_path = target_dir.join(file_name);
+            fs::copy(src_path, dest_path).map_err(|e| e.to_string())?;
         }
     }
-    let _ = app.opener().open_path("D:\\", None::<String>);
-    Ok("核心资产已成功提取至 D 盘".to_string())
+    Ok("导出成功".to_string())
 }
 
-// 🚀 核心：Axum 处理函数，支持全盘符动态读取并支持 Range (进度条拖拽)
 async fn serve_local_file(
     AxumPath(file_path): AxumPath<String>,
     req: axum::extract::Request,
 ) -> Response {
-    // 恢复 Windows 绝对路径
     let path = file_path.trim_start_matches('/').to_string();
     let serve = ServeFile::new(path);
-    
-    // 显式指定 oneshot 处理，确保 Response 类型推导正确
     match serve.oneshot(req).await {
         Ok(res) => res.into_response(),
         Err(_) => axum::http::StatusCode::INTERNAL_SERVER_ERROR.into_response(),
@@ -85,7 +85,6 @@ pub fn run() {
                     .layer(CorsLayer::permissive());
 
                 if let Ok(listener) = tokio::net::TcpListener::bind("127.0.0.1:1421").await {
-                    println!("🚀 极客媒体引擎启动: http://127.0.0.1:1421");
                     let _ = axum::serve(listener, app).await;
                 }
             });
