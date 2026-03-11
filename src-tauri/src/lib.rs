@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 use tauri_plugin_dialog::DialogExt;
-use tauri_plugin_opener::OpenerExt;
 
 // Axum 相关导入
 use axum::{extract::Path as AxumPath, routing::get, Router, response::IntoResponse, response::Response};
