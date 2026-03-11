@@ -97,3 +97,15 @@ body {
 .animate-heartBeat {
   animation: heartBeat 1s ease-in-out;
 }
+
+/* @keyframes shine {
+  0% { transform: translateX(-100%) skewX(-12deg); }
+  20% { transform: translateX(100%) skewX(-12deg); }
+  100% { transform: translateX(100%) skewX(-12deg); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  20% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+} */

@@ -83,101 +83,98 @@ export default function App() {
         e.preventDefault();
         if (currentVideo) toggleFavorite(currentVideo);
       }}
-      onWheel={(e) => {
-        if (videos.length <= 1 || wheelTimer.current) return;
-        const idx = videos.findIndex((v) => v.path === currentVideo);
-        if (idx === -1) return;
-        const nextIdx =
-          e.deltaY > 0
-            ? (idx + 1) % videos.length
-            : (idx - 1 + videos.length) % videos.length;
-        setCurrentVideo(videos[nextIdx].path);
-        wheelTimer.current = window.setTimeout(
-          () => (wheelTimer.current = null),
-          200
-        );
-      }}
       className="relative flex h-screen w-screen overflow-hidden bg-[#0B0B0F] font-sans text-[#E0E0E0] selection:bg-cyan-500/30"
     >
-      {/* 侧边栏 - 毛玻璃深色质感 */}
-      <aside className="relative z-20 flex w-80 flex-col border-r border-[#2A2A35] bg-[#0F0F14]/90 shadow-2xl backdrop-blur-md">
-        {/* 顶部区域 */}
-        <div className="p-6 pb-4">
-          <div className="mb-8 flex items-center justify-between">
+      {/* 侧边栏 - 极简毛玻璃质感 */}
+      <aside className="relative z-20 flex w-80 flex-col border-r border-white/5 bg-[#0C0C10]/80 shadow-2xl backdrop-blur-xl">
+        {/* 顶部品牌区域 */}
+        <div className="px-5 pt-8 pb-4">
+          <div className="mb-10 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="h-3 w-3 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_12px_#06b6d4]" />
-                <div className="absolute inset-0 h-3 w-3 rounded-full bg-cyan-400/30 blur-sm" />
+              {/* Logo 图标 - 增强光效和动感 */}
+              <div className="relative flex h-8 w-8 items-center justify-center">
+                {/* 核心光点 */}
+                <div className="absolute h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_20px_#06b6d4] animate-ping opacity-75" />
+                <div className="absolute h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_15px_#06b6d4] animate-pulse" />
+
+                {/* 外圈旋转光晕 */}
+                <div className="absolute h-6 w-6 rounded-full border border-cyan-400/30 animate-[spin_4s_linear_infinite]" />
+                <div className="absolute h-5 w-5 rounded-full border border-cyan-400/20 animate-[spin_3s_linear_infinite_reverse]" />
+
+                {/* 内部模糊光晕 */}
+                <div className="absolute h-7 w-7 rounded-full bg-cyan-400/10 blur-md" />
+
+                {/* 中心小点（稳定） */}
+                <div className="absolute h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_10px_white]" />
               </div>
-              <h1 className="bg-linear-to-r from-cyan-400 to-purple-400 bg-clip-text text-base font-bold tracking-[0.3em] text-transparent">
+
+              {/* 品牌文字 - 增强渐变与光泽 */}
+              <h1 className="relative bg-linear-to-r from-cyan-300 via-white to-purple-300 bg-clip-text text-base font-bold tracking-[0.3em] text-transparent">
                 V-FLOW
               </h1>
             </div>
-            <span className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-white/40">
-              V1.0.0
-            </span>
+
+            {/* 标签 - 更精致 */}
+            <div className="relative overflow-hidden rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[10px] font-medium text-cyan-300/90 shadow-lg backdrop-blur-sm">
+              <span className="relative z-10">PREVIEW</span>
+            </div>
           </div>
 
-          {/* 操作按钮组 - 水平并排 */}
-          <div className="flex flex-row gap-2">
+          {/* 操作按钮组 - 等宽并排 */}
+          <div className="flex gap-2">
             <button
               onClick={loadDirectory}
-              className="group relative flex flex-1 items-center justify-between overflow-hidden rounded-xl border border-[#33333F] bg-[#1A1A24] px-4 py-2.5 text-sm text-white transition-all duration-300 hover:bg-[#252530"
+              className="group relative flex flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/80 shadow-sm transition-all duration-200 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-white hover:shadow-md hover:shadow-cyan-500/20 active:scale-[0.98] active:bg-cyan-500/15"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                <FolderOpen
-                  size={16}
-                  className="text-cyan-400 transition-transform group-hover:scale-110"
-                />
-                <span className="tracking-wide">导入目录</span>
-              </span>
-              <div className="absolute inset-0 translate-x-\[-100%] bg-linear-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 transition-transform duration-1000 group-hover:translate-x-\[100%]" />
+              <FolderOpen
+                size={16}
+                className="text-cyan-400 transition-transform group-hover:scale-110"
+              />
+              <span>导入目录</span>
+              <div className="absolute inset-0 -z-10 rounded-xl bg-linear-to-r from-cyan-400/0 via-cyan-400/10 to-cyan-400/0 opacity-0 transition-opacity group-hover:opacity-100" />
             </button>
 
             <button
               onClick={exportFavorites}
               disabled={favorites.size === 0 || isExporting}
-              className="group relative flex flex-1 items-center justify-start gap-2 rounded-xl border border-amber-500/30 bg-linear-to-br from-amber-500/10 to-rose-500/10 px-4 py-2.5 text-sm text-amber-400 transition-all duration-300 hover:from-amber-500/20 hover:to-rose-500/20 disabled:pointer-events-none disabled:opacity-20"
+              className="group relative flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-sm font-medium text-rose-400 transition-all duration-200 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 hover:shadow-md hover:shadow-rose-500/20 active:scale-[0.98] active:bg-rose-500/15 disabled:pointer-events-none disabled:opacity-30"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                <span className="relative inline-flex">
-                  <Heart
-                    size={18}
-                    className={`transition-transform duration-300 group-hover:scale-110 ${
-                      favorites.size > 0
-                        ? "fill-rose-500 text-rose-500"
-                        : "text-amber-400/70"
-                    }`}
-                  />
-                </span>
-                <span className="tracking-wide">导出收藏</span>
-                {favorites.size > 0 && (
-                  <span className="absolute -right-5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-lg">
-                    {favorites.size}
-                  </span>
-                )}
+              <Heart
+                size={16}
+                className={`transition-all duration-200 ${
+                  favorites.size > 0
+                    ? "fill-rose-500 text-rose-500"
+                    : "text-rose-400/60 group-hover:text-rose-400"
+                }`}
+              />
+              <span className="transition-all duration-200 group-hover:tracking-wide">
+                导出收藏
               </span>
-              <div className="absolute inset-0 translate-x-\[-100%] bg-linear-to-r from-transparent via-white/5 to-transparent transition-transform duration-1000 group-hover:translate-x-\[100%]" />
+              {favorites.size > 0 && (
+                <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500/20 px-1.5 text-[11px] font-semibold leading-none text-rose-300 ring-1 ring-rose-500/30 backdrop-blur-sm transition-all duration-200 group-hover:scale-105 group-hover:bg-rose-500/30 group-hover:text-rose-200">
+                  {favorites.size}
+                </span>
+              )}
             </button>
           </div>
         </div>
 
-        {/* 媒体列表标题 */}
-        <div className="flex items-center justify-between border-t border-[#2A2A35] px-6 py-3 font-mono text-[10px] text-white/30">
-          <span>媒体库 · {videos.length} 个视频</span>
+        {/* 列表标题 - 极简 */}
+        <div className="flex items-center justify-between px-5 py-2 text-[10px] font-medium tracking-wider text-white/30">
+          <span>媒体库 · {videos.length}</span>
           <span className="flex items-center gap-1">
-            <Clock size={10} />
-            最近播放
+            <Clock size={10} className="opacity-50" />
+            <span>最近</span>
           </span>
         </div>
 
-        {/* 可滚动列表 - 自定义滚动条已在App.css中定义 */}
-        <div className="custom-scrollbar flex-1 space-y-1 overflow-y-auto px-4 pb-4">
+        {/* 可滚动列表 - 自定义滚动条 */}
+        <div className="custom-scrollbar flex-1 space-y-0.5 overflow-y-auto px-3 pb-6">
           {videos.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-white/10">
-              <Film size={48} strokeWidth={1} className="mb-4" />
-              <p className="text-sm">暂无视频</p>
-              <p className="mt-2 text-xs opacity-30">点击导入开始</p>
+            <div className="flex h-full flex-col items-center justify-center pt-20 text-white/10">
+              <Film size={40} strokeWidth={1} className="mb-4" />
+              <p className="text-xs">暂无视频</p>
+              <p className="mt-1 text-[10px] opacity-30">点击导入开始</p>
             </div>
           ) : (
             videos.map((vid, index) => {
@@ -189,84 +186,86 @@ export default function App() {
                   ref={isActive ? activeItemRef : null}
                   onClick={() => setCurrentVideo(vid.path)}
                   className={`
-                    group relative flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3
+                    group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5
                     transition-all duration-200
                     ${
                       isActive
-                        ? "border border-cyan-500/30 bg-linear-to-r from-cyan-500/20 via-cyan-500/5 to-transparent shadow-[0_0_15px_-5px_#06b6d4]"
-                        : "border border-transparent hover:border-[#33333F] hover:bg-[#1A1A24]"
+                        ? "bg-white/10 shadow-[0_2px_8px_-4px_black]"
+                        : "hover:bg-white/5"
                     }
                   `}
                 >
-                  {/* 播放指示器 */}
+                  {/* 激活指示器 */}
                   {isActive && (
-                    <div className="absolute left-0 h-8 w-1 rounded-r-full bg-cyan-400 shadow-[0_0_10px_#06b6d4]" />
+                    <div className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-cyan-400 shadow-[0_0_10px_#06b6d4]" />
                   )}
 
                   {/* 缩略图占位 */}
-                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-linear-to-br from-[#2A2A35] to-[#1A1A24]">
+                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-linear-to-br from-white/10 to-white/5">
                     {isActive ? (
-                      <PlayCircle
-                        size={18}
-                        className="animate-pulse text-cyan-400"
-                      />
+                      <PlayCircle size={16} className="text-cyan-400" />
                     ) : (
-                      <Film size={16} className="text-white/30" />
+                      <Film size={14} className="text-white/30" />
                     )}
                   </div>
 
-                  {/* 文件名和元数据 */}
+                  {/* 文件名 */}
                   <div className="min-w-0 flex-1">
                     <p
                       className={`truncate text-sm ${
                         isActive
                           ? "font-medium text-white"
-                          : "text-white/70 group-hover:text-white"
+                          : "text-white/70 group-hover:text-white/90"
                       }`}
                     >
                       {vid.name}
                     </p>
-                    <div className="mt-1 flex items-center gap-2 font-mono text-[10px]">
-                      <span className="text-white/30">00:00</span>
-                      <span className="h-1 w-1 rounded-full bg-white/20" />
-                      <span className="text-white/30">1080p</span>
-                    </div>
                   </div>
 
-                  {/* 收藏图标 */}
-                  {isFav && (
+                  {/* 收藏标记 - 更明显 */}
+                  {isFav ? (
                     <Heart
-                      size={12}
+                      size={14}
                       fill="#f43f5e"
-                      className="shrink-0 animate-pulse text-rose-500"
+                      className="shrink-0 text-rose-500 drop-shadow-[0_0_6px_#f43f5e]"
                     />
+                  ) : (
+                    <span className="font-mono text-[10px] text-white/20 group-hover:text-white/30">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
                   )}
-
-                  {/* 序号（极简） */}
-                  <span className="font-mono text-[10px] text-white/20 group-hover:text-white/40">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                 </div>
               );
             })
           )}
         </div>
 
-        {/* 底部状态栏 */}
-        <div className="flex items-center justify-between border-t border-[#2A2A35] px-6 py-4 font-mono text-[10px] text-white/30">
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981]" />
-            <span>就绪</span>
-          </div>
-          <span className="flex cursor-help items-center gap-1 transition-colors hover:text-white/50">
-            <Command size={10} />
-            F1 帮助
+        {/* 底部 - 仅保留帮助入口 */}
+        <div className="flex items-center justify-end border-t border-white/5 px-5 py-3 text-[10px] font-medium text-white/30">
+          <span className="flex cursor-help items-center gap-1.5 transition-colors hover:text-white/50">
+            <span>F1 帮助</span>
           </span>
         </div>
       </aside>
 
-      {/* 主画布区域 - 更丰富的背景层次 */}
-      <main className="relative flex flex-1 flex-col bg-[#08080C] p-6 lg:p-8">
+      {/* 主画布区域 - 滚轮事件已移至此 */}
+      <main
+        onWheel={(e) => {
+          if (videos.length <= 1 || wheelTimer.current) return;
+          const idx = videos.findIndex((v) => v.path === currentVideo);
+          if (idx === -1) return;
+          const nextIdx =
+            e.deltaY > 0
+              ? (idx + 1) % videos.length
+              : (idx - 1 + videos.length) % videos.length;
+          setCurrentVideo(videos[nextIdx].path);
+          wheelTimer.current = window.setTimeout(
+            () => (wheelTimer.current = null),
+            200
+          );
+        }}
+        className="relative flex flex-1 flex-col bg-[#08080C] p-6 lg:p-8"
+      >
         {/* 动态背景网格 */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black_40%,transparent_100%)]" />
 

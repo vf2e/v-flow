@@ -17,7 +17,7 @@ import {
   ControlSpacer,
 } from "@vime/react";
 import "@vime/core/themes/default.css";
-import { Gauge, RotateCw, Heart } from "lucide-react";
+import { Gauge, RotateCw, Bookmark } from "lucide-react";
 import { useVideoStore } from "../store/useVideoStore";
 interface PlayerProps {
   videoPath: string | null;
@@ -191,6 +191,12 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
       <div className="absolute top-8 left-8 z-50 flex flex-col gap-3 pointer-events-none group-hover:opacity-100 opacity-0 transition-all duration-500">
         <div className="flex items-center gap-2">
+          <Bookmark
+            size={18}
+            className={`transition-transform duration-100 ${
+              isFavorite ? "fill-yellow-400" : "text-slate-400"
+            }`}
+          />
           <div className="bg-cyan-500/20 backdrop-blur-md border border-cyan-500/40 px-3 py-1 rounded-lg flex items-center gap-2">
             <Gauge size={14} className="text-cyan-400" />
             <span className="text-[11px] font-black text-cyan-50 font-mono tracking-tighter">
@@ -201,30 +207,6 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
             <RotateCw size={14} className="text-slate-400" />
             <span className="text-[11px] font-mono text-slate-300">
               {rotation}°
-            </span>
-          </div>
-          {/* 收藏标识：亮红霓虹效果 */}
-          <div
-            className={`transition-all duration-500 backdrop-blur-md border px-3 py-1 rounded-lg flex items-center gap-2 ${
-              isFavorite
-                ? "bg-rose-500/20 border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
-                : "bg-slate-900/40 border-white/10 opacity-40"
-            }`}
-          >
-            <Heart
-              size={14}
-              className={`transition-transform duration-100 ${
-                isFavorite
-                  ? "fill-rose-500 text-rose-500 scale-110"
-                  : "text-slate-400"
-              }`}
-            />
-            <span
-              className={`text-[10px] font-bold tracking-[0.2em] font-mono ${
-                isFavorite ? "text-rose-200" : "text-slate-500"
-              }`}
-            >
-              {isFavorite ? "已收藏" : "未收藏"}
             </span>
           </div>
         </div>
