@@ -46,7 +46,7 @@ export default function App() {
     if (activeItemRef.current) {
       activeItemRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "nearest", 
       });
     }
   }, [currentVideo]);
@@ -74,19 +74,15 @@ export default function App() {
 
   const exportFavorites = async () => {
     if (favorites.size === 0) return;
-
     try {
       const selectedPath = await open({
         directory: true,
         multiple: false,
         title: "选择导出文件夹",
       });
-
       if (!selectedPath) return;
-
       setIsExporting(true);
       setExportProgress(0);
-
       const paths = Array.from(favorites);
       for (let i = 0; i < paths.length; i++) {
         await invoke("export_favorites", {
@@ -95,28 +91,27 @@ export default function App() {
         });
         setExportProgress(Math.round(((i + 1) / paths.length) * 100));
       }
-
       setTimeout(() => {
         setIsExporting(false);
         setExportProgress(0);
         toast.success('收藏视频已导出完成');
       }, 500);
     } catch (err) {
-      toast.success(`导出出错: ${err}`);
+      toast.error(`导出出错: ${err}`);
       setIsExporting(false);
     }
   };
 
   return (
     <div
-      onContextMenu={(e) => {
-        e.preventDefault();
-        if (currentVideo) toggleFavorite(currentVideo);
-      }}
       className="relative flex h-screen w-screen overflow-hidden bg-[#0B0B0F] font-sans text-[#E0E0E0] selection:bg-cyan-500/30"
     >
       <Toaster richColors/>
-      <aside className="relative z-20 flex w-80 flex-col border-r border-white/5 bg-[#0C0C10]/80 shadow-2xl backdrop-blur-xl">
+      
+      <aside 
+        className="relative z-20 flex w-80 flex-col border-r border-white/5 bg-[#0C0C10]/80 shadow-2xl backdrop-blur-xl"
+        onWheel={(e) => e.stopPropagation()} 
+      >
         <div className="px-5 pt-8 pb-4">
           <div className="mb-10 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -130,9 +125,8 @@ export default function App() {
                 V-FLOW
               </h1>
             </div>
-
             <div className="relative overflow-hidden rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[12px] font-medium text-cyan-300/90 shadow-lg backdrop-blur-sm">
-              <span className="relative z-10">PREVIEW</span>
+              <span>PREVIEW</span>
             </div>
           </div>
 
@@ -145,7 +139,6 @@ export default function App() {
                 <FolderOpen size={16} className="text-cyan-400 transition-transform group-hover:scale-110" />
                 <span>导入目录</span>
               </button>
-
               <button
                 onClick={exportFavorites}
                 disabled={favorites.size === 0 || isExporting}
@@ -160,7 +153,6 @@ export default function App() {
                 )}
               </button>
             </div>
-
             {isExporting && (
               <div className="px-1 animate-in fade-in slide-in-from-top-1 duration-300">
                 <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/5 ring-1 ring-white/5">
@@ -168,10 +160,6 @@ export default function App() {
                     className="h-full bg-linear-to-r from-cyan-500 to-purple-500 transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]"
                     style={{ width: `${exportProgress}%` }}
                   />
-                </div>
-                <div className="mt-1 flex justify-between text-[12px] font-mono text-white/20 tracking-tighter">
-                  <span>正在传输数据...</span>
-                  <span className="text-cyan-400/60">{exportProgress}%</span>
                 </div>
               </div>
             )}
@@ -186,12 +174,11 @@ export default function App() {
           </span>
         </div>
 
-        <div className="custom-scrollbar flex-1 space-y-0.5 overflow-y-auto px-3 pb-6">
+        <div className="custom-scrollbar flex-1 space-y-0.5 overflow-y-auto px-3 pb-6 scroll-smooth">
           {videos.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center pt-20 text-white/10">
               <Film size={40} strokeWidth={1} className="mb-4" />
               <p className="text-xs">暂无视频</p>
-              <p className="mt-1 text-[12px] opacity-30">点击导入开始</p>
             </div>
           ) : (
             videos.map((vid, index) => {
@@ -202,7 +189,7 @@ export default function App() {
                   key={vid.path}
                   ref={isActive ? activeItemRef : null}
                   onClick={() => setCurrentVideo(vid.path)}
-                  className={`group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ${
+                  className={`group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-150 ${
                     isActive ? "bg-white/10 shadow-[0_2px_8px_-4px_black]" : "hover:bg-white/5"
                   }`}
                 >
@@ -244,17 +231,15 @@ export default function App() {
           if (idx === -1) return;
           const nextIdx = e.deltaY > 0 ? (idx + 1) % videos.length : (idx - 1 + videos.length) % videos.length;
           setCurrentVideo(videos[nextIdx].path);
-          wheelTimer.current = window.setTimeout(() => (wheelTimer.current = null), 200);
+          wheelTimer.current = window.setTimeout(() => (wheelTimer.current = null), 250);
         }}
         className="relative flex flex-1 flex-col bg-[#08080C] p-6 lg:p-8"
       >
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black_40%,transparent_100%)]" />
-        <div className="absolute -left-1/4 top-1/4 h-125 w-125 rounded-full bg-cyan-500/10 blur-[120px]" />
-        <div className="absolute -right-1/4 bottom-1/4 h-125 w-125 rounded-full bg-purple-500/10 blur-[120px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_50%_at_50%_50%,black_40%,transparent_100%)] pointer-events-none" />
         <div className="relative flex-1 overflow-hidden rounded-2xl border border-white/5 bg-black/40 shadow-2xl ring-1 ring-white/10 backdrop-blur-sm">
           <GeekPlayer videoPath={currentVideo} />
           {!currentVideo && (
-            <div className="absolute inset-0 flex items-center justify-center text-center opacity-20">
+            <div className="absolute inset-0 flex items-center justify-center text-center opacity-20 pointer-events-none">
                 <div>
                     <Film size={64} className="mx-auto mb-4" />
                     <p className="text-sm tracking-widest uppercase">系统已就绪，等待载入视频目录...</p>
@@ -290,7 +275,8 @@ export default function App() {
                   { keys: ["Z", "X"], desc: "快退 / 快进 5秒" },
                   { keys: ["[", "]"], desc: "减速 / 加速" },
                   { keys: ["F1"], desc: "打开帮助" },
-                  { keys: ["ESC"], desc: "关闭帮助" },
+                  { keys: ["F2"], desc: "播放器设置" },
+                  { keys: ["ESC"], desc: "关闭窗口" },
                 ].map((item, idx) => (
                   <div key={idx} className="group flex items-start gap-3 rounded-xl border border-white/5 bg-black/20 p-3 transition-colors hover:border-cyan-500/30">
                     <div className="flex gap-1">
