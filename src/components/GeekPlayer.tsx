@@ -3,13 +3,11 @@ import {
   Gauge,
   RotateCw,
   Bookmark,
-  Sparkles,
   Heart,
   Settings2,
   X,
 } from "lucide-react";
 import { useVideoStore } from "../store/useVideoStore";
-
 import {
   MediaPlayer,
   MediaProvider,
@@ -41,8 +39,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const [enableHeart, setEnableHeart] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
-  const { videos, setCurrentVideo, favorites, toggleFavorite } =
-    useVideoStore();
+  const { videos, setCurrentVideo, favorites, toggleFavorite, volume, setVolume } = useVideoStore();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -90,6 +87,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
   const safePath = videoPath.replace(/\\/g, "/");
   const serverUrl = `http://127.0.0.1:1421/stream/${encodeURI(safePath)}`;
+  // const serverUrl = convertFileSrc(videoPath);
 
   const isVerticalRotated = Math.abs(rotation % 180) === 90;
   const isFavorite = favorites.has(videoPath);
@@ -111,6 +109,9 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         streamType="on-demand"
         load="eager"
         playbackRate={playbackRate}
+        autoPlay={true}
+        volume={volume} 
+        onVolumeChange={(event: any) => setVolume(event.volume)}
         className="w-full h-full absolute inset-0 flex items-center justify-center font-sans"
         keyShortcuts={{}}
       >

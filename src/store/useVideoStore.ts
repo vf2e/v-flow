@@ -12,10 +12,12 @@ interface VideoState {
   currentVideo: string | null;
   videos: VideoItem[];
   exportProgress: number;
+  volume: number;
   setVideos: (videos: VideoItem[]) => void;
   setCurrentVideo: (path: string | null) => void;
   toggleFavorite: (path: string) => void;
   setExportProgress: (progress: number) => void;
+  setVolume: (volume: number) => void;
 }
 
 export const useVideoStore = create<VideoState>()(
@@ -25,10 +27,12 @@ export const useVideoStore = create<VideoState>()(
       currentVideo: null,
       videos: [],
       exportProgress: 0,
+      volume: 1,
       
       setVideos: (videos) => set({ videos }),
       setCurrentVideo: (path) => set({ currentVideo: path }),
       setExportProgress: (exportProgress) => set({ exportProgress }),
+      setVolume: (volume) => set({ volume }), 
       
       toggleFavorite: (path) => set((state) => {
         const next = new Set(state.favorites);
