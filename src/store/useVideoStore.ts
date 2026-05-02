@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface VideoItem {
   name: string;
@@ -13,9 +13,14 @@ interface VideoState {
   videos: VideoItem[];
   exportProgress: number;
   volume: number;
+  currentDir: string | null;
+
   setVideos: (videos: VideoItem[]) => void;
   setCurrentVideo: (path: string | null) => void;
   toggleFavorite: (path: string) => void;
+  clearFavorites: () => void;
+  setFavorites: (favs: Set<string>) => void;
+  setCurrentDir: (dir: string | null) => void;
   setExportProgress: (progress: number) => void;
   setVolume: (volume: number) => void;
 }
@@ -28,30 +33,31 @@ export const useVideoStore = create<VideoState>()(
       videos: [],
       exportProgress: 0,
       volume: 1,
-      
+      currentDir: null,
+
       setVideos: (videos) => set({ videos }),
       setCurrentVideo: (path) => set({ currentVideo: path }),
       setExportProgress: (exportProgress) => set({ exportProgress }),
-      setVolume: (volume) => set({ volume }), 
-      
-      toggleFavorite: (path) => set((state) => {
-        const next = new Set(state.favorites);
-        if (next.has(path)) next.delete(path);
-        else next.add(path);
-        return { favorites: next };
-      }),
+      setVolume: (volume) => set({ volume }),
+      setCurrentDir: (dir) => set({ currentDir: dir }),
+      setFavorites: (favs) => set({ favorites: favs }),
+
+      clearFavorites: () => set({ favorites: new Set<string>() }),
+
+      toggleFavorite: (path) =>
+        set((state) => {
+          const next = new Set(state.favorites);
+          if (next.has(path)) next.delete(path);
+          else next.add(path);
+          return { favorites: next };
+        }),
     }),
     {
-      name: 'v-flow-storage-v2',
-      partialize: (state) => ({
-        ...state,
-        favorites: Array.from(state.favorites),
-      }) as any,
-      onRehydrateStorage: () => (state) => {
-        if (state && Array.isArray(state.favorites)) {
-          state.favorites = new Set(state.favorites);
-        }
-      },
+      name: "v-flow-storage-v3",
+      partialize: (state) =>
+        ({
+          volume: state.volume,
+        } as any),
     }
   )
 );

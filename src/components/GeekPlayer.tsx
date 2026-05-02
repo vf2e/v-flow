@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Gauge,
-  RotateCw,
-  Bookmark,
-  Heart,
-  Settings2,
-  X,
-} from "lucide-react";
+import { Gauge, RotateCw, Bookmark, Heart, Settings2, X } from "lucide-react";
 import { useVideoStore } from "../store/useVideoStore";
 import {
   MediaPlayer,
@@ -39,7 +32,14 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
   const [enableHeart, setEnableHeart] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
-  const { videos, setCurrentVideo, favorites, toggleFavorite, volume, setVolume } = useVideoStore();
+  const {
+    videos,
+    setCurrentVideo,
+    favorites,
+    toggleFavorite,
+    volume,
+    setVolume,
+  } = useVideoStore();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -110,7 +110,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         load="eager"
         playbackRate={playbackRate}
         autoPlay={true}
-        volume={volume} 
+        volume={volume}
         onVolumeChange={(event: any) => setVolume(event.volume)}
         className="w-full h-full absolute inset-0 flex items-center justify-center font-sans"
         keyShortcuts={{}}
@@ -126,6 +126,14 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
         >
           <MediaProvider className="w-full h-full pointer-events-none">
             <style>{`
+              @keyframes gradient-x {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+              }
+              .animate-gradient-x {
+                background-size: 200% 200%;
+                animation: gradient-x 3s ease infinite;
+              }
               video { object-fit: contain !important; width: 100% !important; height: 100% !important; }
             `}</style>
           </MediaProvider>
@@ -146,56 +154,74 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
           </div>
         )}
 
-        {/* 底部悬浮控制栏 */}
-        <div
-          className="absolute inset-x-0 bottom-8 px-10 z-50 flex flex-col items-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0"
+{/* 底部悬浮控制栏 (终极打磨版) */}
+<div
+          // 修复：黑色渐变遮罩改回 v3 兼容的 bg-gradient-to-t
+          className="absolute inset-x-0 bottom-0 px-10 pb-8 pt-32 z-50 flex flex-col items-center gap-2 bg-linear-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-[opacity,transform] duration-500 ease-out translate-y-4 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto"
           onContextMenu={(e) => e.stopPropagation()}
         >
-          {/* 进度条 */}
-          <div className="w-full max-w-4xl px-2 group/progress">
-            <TimeSlider.Root className="relative flex w-full items-center h-6 cursor-pointer outline-none touch-none">
-              <TimeSlider.Preview className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-[visible]:opacity-100 mb-6">
-                <TimeSlider.Value className="text-[12px] font-mono font-bold text-cyan-400 bg-black/90 px-2.5 py-1 rounded-md border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]" />
+          {/* ========== 终极流光进度条 (左右带时间显示) ========== */}
+          <div className="flex items-center gap-4 w-full max-w-4xl px-2 group/progress">
+            
+            {/* 💡 新增：当前时间 (在进度条左侧) */}
+            <span className="text-[12px] font-mono font-medium text-cyan-400 tracking-wider">
+              <TimeText type="current" />
+            </span>
+
+            {/* 进度条本体 */}
+            <TimeSlider.Root className="relative flex-1 flex items-center h-8 cursor-pointer outline-none touch-none py-3">
+              
+              <TimeSlider.Preview className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-visible:opacity-100 mb-0.5">
+                <TimeSlider.Value className="text-[15px] font-mono font-bold text-white bg-black/90 px-2 py-1 rounded border border-cyan-500/30 shadow-[0_0_15px_rgba(0,0,0,0.8)] backdrop-blur-md" />
               </TimeSlider.Preview>
 
-              <TimeSlider.Track className="relative h-1.5 w-full rounded-full bg-white/10 overflow-visible group-hover/progress:h-2 transition-all duration-300">
-                <TimeSlider.TrackFill className="absolute h-full bg-cyan-500 rounded-full shadow-[0_0_12px_#06b6d4] will-change-transform" />
-                <TimeSlider.Progress className="absolute h-full bg-white/20 rounded-full" />
+              <TimeSlider.Track className="relative h-1 w-full rounded-full bg-white/20 overflow-visible group-hover/progress:h-1.5 transition-[height] duration-300 ease-out">
+                <div
+                  className="absolute left-0 top-0 h-full bg-white/30 rounded-full"
+                  style={{ width: "var(--slider-pointer, var(--slider-fill))" }}
+                />
+                
+                {/* 💡 修复没颜色：改回 Tailwind v3 支持的 bg-gradient-to-r，并加入 bg-cyan-400 保底 */}
+                <TimeSlider.TrackFill className="absolute h-full rounded-full bg-cyan-400 bg-linear-to-r from-cyan-400 via-purple-500 to-cyan-400 animate-gradient-x shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
               </TimeSlider.Track>
-              <TimeSlider.Thumb className="absolute top-1/2 -translate-y-1/2 left-[var(--slider-fill)] w-4 h-4 rounded-full bg-white border-2 border-cyan-400 shadow-[0_0_15px_rgba(255,255,255,0.8)] scale-0 group-hover/progress:scale-100 transition-transform duration-200 will-change-[left]" />
+
+              <TimeSlider.Thumb className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-(--slider-fill) w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,1)] opacity-0 scale-50 group-hover/progress:opacity-100 group-hover/progress:scale-100 transition-[opacity,transform] duration-200 pointer-events-none" />
             </TimeSlider.Root>
+
+            {/* 💡 新增：总时间 (在进度条右侧) */}
+            <span className="text-[12px] font-mono font-medium text-white/40 tracking-wider">
+              <TimeText type="duration" />
+            </span>
+            
           </div>
 
-          {/* 按钮控制面板 */}
-          <div className="flex items-center justify-between w-full max-w-3xl bg-[#0F0F14]/70 backdrop-blur-3xl border border-white/10 rounded-2xl px-6 py-2.5 shadow-2xl pointer-events-auto ring-1 ring-white/10">
+          {/* ========== 按钮控制面板 ========== */}
+          <div className="flex items-center justify-between w-full max-w-3xl bg-[#0F0F14]/70 backdrop-blur-3xl border border-white/10 rounded-2xl px-6 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)] pointer-events-auto ring-1 ring-white/10 mt-1">
             <div className="flex items-center gap-6">
               <PlayButton className="text-white/90 hover:text-cyan-400 transition-all active:scale-90">
                 <PlayIcon />
               </PlayButton>
 
-              {/* 🚀 美化后的音量调节 */}
+              {/* 音量调节 */}
               <div className="flex items-center gap-2 group/vol relative">
-                <MuteButton className="text-white/40 hover:text-white transition-all hover:scale-110 active:scale-95">
+                <MuteButton className="text-white/40 hover:text-white transition-all hover:scale-110 active:scale-95 z-10">
                   <VolumeIcon />
                 </MuteButton>
-                <div className="flex items-center w-0 group-hover/vol:w-28 overflow-hidden transition-all duration-500 ease-out">
-                  <VolumeSlider.Root className="relative flex items-center h-6 w-24 mx-2 cursor-pointer touch-none">
-                    <VolumeSlider.Track className="h-1 w-full rounded-full bg-white/10 overflow-visible">
-                      <VolumeSlider.TrackFill className="bg-linear-to-r from-cyan-500/50 to-cyan-400 h-full rounded-full shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
+                
+                <div className="flex items-center w-0 opacity-0 pointer-events-none group-hover/vol:w-28 group-hover/vol:opacity-100 group-hover/vol:pointer-events-auto transition-all duration-300 ease-out">
+                  <VolumeSlider.Root className="relative flex items-center h-6 w-24 mx-2 cursor-pointer touch-none group/vol-slider">
+                    <VolumeSlider.Track className="h-1.5 w-full rounded-full bg-white/10 overflow-visible">
+                      {/* 同步修复：音量条的渐变也改为 bg-gradient-to-r */}
+                      <VolumeSlider.TrackFill className="bg-purple-500 bg-linear-to-r from-cyan-500 to-purple-500 h-full rounded-full shadow-[0_0_10px_rgba(139,92,246,0.6)]" />
                     </VolumeSlider.Track>
-                    <VolumeSlider.Thumb className="absolute top-1/2 -translate-y-1/2 left-[var(--slider-fill)] w-3 h-3 rounded-full bg-white border-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)] transition-transform hover:scale-125" />
+                    
+                    <VolumeSlider.Thumb className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-(--slider-fill) w-3 h-3 rounded-full bg-white border-2 border-purple-400 shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-[transform] hover:scale-125" />
                   </VolumeSlider.Root>
                 </div>
               </div>
-
-              <div className="flex items-center font-mono text-[11px] font-bold tracking-tighter text-white/20">
-                <TimeText type="current" />
-                <span className="mx-2 opacity-10">/</span>
-                <TimeText type="duration" />
-              </div>
             </div>
 
-            {/* 倍速与角度 */}
+            {/* 倍速与旋转 */}
             <div className="flex items-center gap-5">
               <div className="flex items-center gap-4 px-4 py-1 bg-white/5 rounded-full border border-white/5 shadow-inner">
                 <div className="flex items-center gap-2">
@@ -265,7 +291,7 @@ export default function GeekPlayer({ videoPath }: PlayerProps) {
 
       {/* F2 设置 */}
       {showSettings && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowSettings(false)}
@@ -339,6 +365,7 @@ function MasterKeyboardController({
 }: any) {
   const player = useMediaPlayer();
   const wheelTimer = useRef<number | null>(null);
+  const wheelAccumulator = useRef<number>(0); // 新增：滚动距离累加器
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -369,21 +396,47 @@ function MasterKeyboardController({
           break;
       }
     };
+
     const handleWheel = (e: WheelEvent) => {
-      if (videos.length <= 1 || wheelTimer.current) return;
-      const idx = videos.findIndex((v: any) => v.path === currentVideo);
-      if (idx === -1) return;
-      const nextIdx =
-        e.deltaY > 0
-          ? (idx + 1) % videos.length
-          : (idx - 1 + videos.length) % videos.length;
-      setCurrentVideo(videos[nextIdx].path);
-      wheelTimer.current = window.setTimeout(() => {
-        wheelTimer.current = null;
-      }, 250);
+      // 如果视频太少，直接忽略
+      if (videos.length <= 1) return;
+
+      // 1. 累加滚动距离 (适配触摸板微小滚动和普通鼠标的大步数滚动)
+      wheelAccumulator.current += e.deltaY;
+
+      // 2. 只有当累加滚动距离超过阈值 (例如 80) 时，才判定为一次有效的“切换意图”
+      if (Math.abs(wheelAccumulator.current) > 80) {
+        // 3. 如果还在冷却时间内，我们清空累加器，阻止频繁触发，直接 return
+        if (wheelTimer.current) {
+          wheelAccumulator.current = 0;
+          return;
+        }
+
+        const idx = videos.findIndex((v: any) => v.path === currentVideo);
+        if (idx === -1) return;
+
+        // 判断方向并切换
+        const nextIdx =
+          wheelAccumulator.current > 0
+            ? (idx + 1) % videos.length
+            : (idx - 1 + videos.length) % videos.length;
+
+        setCurrentVideo(videos[nextIdx].path);
+
+        // 4. 重置累加器
+        wheelAccumulator.current = 0;
+
+        // 5. 开启硬核冷却时间 (500ms 内无论怎么滚都不会再切，营造"一步一停"的手感)
+        wheelTimer.current = window.setTimeout(() => {
+          wheelTimer.current = null;
+        }, 500);
+      }
     };
+
     window.addEventListener("keydown", handleKeyDown);
+    // passive: false 允许在有需要时 e.preventDefault()
     window.addEventListener("wheel", handleWheel, { passive: false });
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleWheel);
@@ -398,6 +451,7 @@ function MasterKeyboardController({
     setRotation,
     setPlaybackRate,
   ]);
+
   return null;
 }
 
